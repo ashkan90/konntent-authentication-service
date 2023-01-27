@@ -1,0 +1,34 @@
+---
+version: 2.0
+
+application:
+  clients:
+    workspace:
+      base-url: "http://localhost:8082/v1"
+      timeout: 5000
+
+  client:
+    url: ""
+
+  #  auth:
+  #    google:
+  #      client-id: "710083497247-piub0b6he54rd5cdoq8u3qhstl1q5uav.apps.googleusercontent.com"
+  #      client-secret: "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"
+  #      redirect-url: "http://localhost:8081/register?provider=google"
+  #      scopes:
+  #        - "https://www.googleapis.com/auth/userinfo.email"
+  #    github:
+  #      client-id: "25cf7e19adddffece0e9"
+  #      client-secret: "68e65a089a7c0b66d7a47cc98f069736f0fdc888"
+  #      redirect-url: "http://localhost:8081/register?provider=github"
+  #      scopes:
+  #        - "user:email"
+
+  postgres:
+    user: "postgres"
+    password: "qwert"
+    debug: true
+
+  jwt-config:
+    ttl: 1
+    sk: "3ekOnqSPRe1c10KQqFpqQeR5Nk4503NETDVorGoXEpc"

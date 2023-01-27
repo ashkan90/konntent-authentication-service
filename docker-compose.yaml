@@ -1,0 +1,56 @@
+version: '3.3'
+services:
+  konntent-authentication-service:
+    image: cosmtrek/air
+    command: -c=.air.app.toml
+    working_dir: /app
+    environment:
+      - ENV=production
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./:/app
+      - go-modules-volume:/go/pkg/mod
+    networks:
+      - service
+    depends_on:
+      - authentication-yugabyte
+    restart: always
+
+  authentication-yugabyte:
+    container_name: yb-auth-master-n1
+    image: yugabytedb/yugabyte:latest
+    environment:
+      POSTGRES_USER: konntent
+      POSTGRES_PASSWORD: 345xyxyyayaqd3
+      POSTGRES_DB: konntent-auth
+      PGDATA: /data/yb
+      SERVICE_7000_NAME: yb-master
+    command: |
+      bash -c '
+      mkdir -p /var/ybinit
+      echo "create user '\''$${POSTGRES_USER}'\'' with password '\''$${POSTGRES_PASSWORD}'\'';" > /var/ybinit/01-usr.sql
+      echo "create database $${POSTGRES_DB:-$${POSTGRES_USER}};             " > /var/ybinit/02-db.sql
+      # start YugabyteDB
+      bin/yugabyted start --listen 0.0.0.0 --daemon=false --initial_scripts_dir=/var/ybinit --tserver_flags=ysql_enable_auth=true
+      '
+    volumes:
+      - yb-master-data-1:/var/ybinit
+    ports:
+      - "7000:7000"
+      - "9000:9000"
+      - "5433:5433"
+      - "9042:9042"
+    networks:
+      - yb
+    restart: unless-stopped
+
+networks:
+  yb:
+    driver: bridge
+  service:
+    driver: bridge
+
+volumes:
+  go-modules-volume:
+  yb-master-data-1:
