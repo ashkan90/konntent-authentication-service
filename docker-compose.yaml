@@ -29,10 +29,12 @@ services:
     command: |
       bash -c '
       mkdir -p /var/ybinit
-      echo "create user '\''$${POSTGRES_USER}'\'' with password '\''$${POSTGRES_PASSWORD}'\'';" > /var/ybinit/01-usr.sql
-      echo "create database $${POSTGRES_DB:-$${POSTGRES_USER}};             " > /var/ybinit/02-db.sql
+      echo "create database $${POSTGRES_DB};             \n" > /var/ybinit/int.sql
+      echo "create user '\''$${POSTGRES_USER}'\'' with encrypted password '\''$${POSTGRES_PASSWORD}'\''; \n" > /var/ybinit/int.sql
+      echo "grant all privileges on database $${POSTGRES_DB} to $${POSTGRES_USER}; \n" > /var/ybinit/int.sql
       # start YugabyteDB
-      bin/yugabyted start --listen 0.0.0.0 --daemon=false --initial_scripts_dir=/var/ybinit --tserver_flags=ysql_enable_auth=true
+      bin/yugabyted start --listen 0.0.0.0 --daemon=false --tserver_flags=ysql_enable_auth=true
+      bin/ysqlsh -f /var/ybinit/int.sql
       '
     volumes:
       - yb-master-data-1:/var/ybinit

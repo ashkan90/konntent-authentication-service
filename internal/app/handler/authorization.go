@@ -27,7 +27,7 @@ func NewAuthHandler(o orchestration.Authentication, r authorize.Repository) Auth
 }
 
 func (h *authHandler) Login(c *fiber.Ctx) error {
-	var req = request.NewLoginInternalRequest(c.Params("uid"))
+	var req = request.NewLoginInternalRequest(c.Query("uid", "0"))
 
 	// double-check that the uid is valid
 	exist := h.repo.CheckID(c.Context(), req.UID)
@@ -65,5 +65,7 @@ func (h *authHandler) Register(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	return c.RedirectToRoute("external-login", map[string]interface{}{"uid": uid})
+	return c.JSON(map[string]interface{}{
+		"uid": uid,
+	})
 }

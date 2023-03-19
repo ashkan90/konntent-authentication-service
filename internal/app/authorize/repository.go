@@ -27,9 +27,12 @@ func NewAuthorizeRepository(l *zap.Logger, pgi pg.Instance) Repository {
 
 func (r *authorizeRepository) AddUser(c context.Context, u *datamodel.User) (int, error) {
 	var err error
+	var userQuery = `
+INSERT INTO "users" ("id", "email", "password") 
+			VALUES (DEFAULT, ?, crypt(?, gen_salt('bf'))) RETURNING "id"`
 
 	err = r.pgi.Open().RunInTransaction(c, func(tx *pgt.Tx) error {
-		_, _err := tx.Model(u).Insert()
+		_, _err := tx.QueryOneContext(c, u, userQuery, u.Email, u.Password)
 		if _err != nil {
 			return _err
 		}

@@ -11,6 +11,7 @@ import (
 	pg_migration "konntent-authentication-service/pkg/pg-migration"
 	pg_rel_registration "konntent-authentication-service/pkg/pg-rel-registration"
 	"konntent-authentication-service/pkg/workspaceclient"
+	"sync"
 	"time"
 
 	"github.com/spf13/viper"
@@ -114,9 +115,12 @@ func registrar(l *zap.Logger) {
 }
 
 func migrate(l *zap.Logger, pg pg.Instance) {
-	err := pg_migration.Migrate(pg, pg_migration.MigrationModels...)
-	if err != nil {
-		l.Error("something went wrong while migrating...",
-			zap.Error(err))
-	}
+	var once sync.Once
+	once.Do(func() {
+		err := pg_migration.Migrate(pg, pg_migration.MigrationModels...)
+		if err != nil {
+			l.Error("something went wrong while migrating...",
+				zap.Error(err))
+		}
+	})
 }

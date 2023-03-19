@@ -55,10 +55,10 @@ func (ao *authenticationOrchestration) Register(c context.Context, dto request.R
 		return uid, err
 	}
 
-	err = ao.workspaceService.AddWorkspace(c, dto.Workspace.ToModel(uid))
-	if err != nil {
-		return uid, err
-	}
+	//err = ao.workspaceService.AddWorkspace(c, dto.Workspace.ToModel(uid))
+	//if err != nil {
+	//	return uid, err
+	//}
 
 	return uid, nil
 }
